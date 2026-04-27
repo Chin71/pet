@@ -3,136 +3,200 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>拯救心愛的寵物大作戰</title>
+    <title>拯救心愛的寵物大作戰 - 動畫版</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f8ff;
+            background-color: #2c3e50; /* 換成更有遊戲感的深色背景 */
             text-align: center;
             margin: 0;
             padding: 20px;
-            color: #333;
+            color: #ecf0f1;
         }
         #game-container {
-            max-width: 600px;
+            max-width: 650px;
             margin: 0 auto;
-            background: white;
+            background: #34495e;
             padding: 20px;
             border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+            border: 4px solid #7f8c8d;
         }
-        h1 { color: #ff6b6b; }
-        .hidden { display: none; }
+        h1 { color: #f1c40f; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        .hidden { display: none !important; }
+        
         .btn {
-            background-color: #4ecdc4;
+            background-color: #e67e22;
             color: white;
-            border: none;
-            padding: 10px 20px;
+            border: 2px solid #d35400;
+            padding: 12px 20px;
             margin: 5px;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 16px;
+            font-weight: bold;
             transition: 0.2s;
         }
-        .btn:hover { background-color: #45b7d1; }
+        .btn:hover { background-color: #d35400; transform: scale(1.05); }
         .btn-option {
             display: block;
             width: 100%;
             margin: 10px 0;
-            background-color: #f7f1e3;
-            color: #333;
-            border: 2px solid #d1ccc0;
+            background-color: #ecf0f1;
+            color: #2c3e50;
+            border: 3px solid #bdc3c7;
+            text-align: left;
+            padding-left: 20px;
         }
-        .btn-option:hover { background-color: #d1ccc0; }
+        .btn-option:hover { background-color: #bdc3c7; }
+        
+        /* 角色選擇區 */
         .character-grid {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 10px;
+            gap: 15px;
             margin-bottom: 20px;
         }
         .char-card {
-            border: 2px solid #ccc;
-            padding: 10px;
+            background: #2c3e50;
+            border: 3px solid #7f8c8d;
+            padding: 15px;
             border-radius: 10px;
             cursor: pointer;
-            font-size: 24px;
+            font-size: 30px;
+            transition: 0.3s;
         }
+        .char-card:hover { transform: translateY(-5px); }
         .char-card.selected {
-            border-color: #ff6b6b;
-            background-color: #ffeaea;
+            border-color: #f1c40f;
+            background-color: #e67e22;
+            box-shadow: 0 0 15px #f1c40f;
         }
-        .status-bar {
+
+        /* 戰鬥舞台設計 */
+        .battle-stage {
             display: flex;
-            justify-content: space-between;
-            background: #eee;
-            padding: 10px;
+            justify-content: space-around;
+            align-items: center;
+            background: url('https://www.transparenttextures.com/patterns/cubes.png') #27ae60; /* 簡單的草地背景 */
             border-radius: 10px;
+            padding: 30px 10px;
             margin-bottom: 20px;
-            font-weight: bold;
+            border: 3px solid #2ecc71;
+            position: relative;
         }
-        .monster-area {
-            font-size: 60px;
-            margin: 20px 0;
+        
+        .hp-info {
+            background: rgba(0,0,0,0.6);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-top: 10px;
         }
+
+        /* 動畫設定 */
+        .animated-char {
+            font-size: 80px;
+            display: inline-block;
+            animation: idle 2s infinite ease-in-out;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+            position: relative;
+            z-index: 2;
+        }
+
+        @keyframes idle {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        @keyframes playerAttack {
+            0% { transform: translateX(0); }
+            40% { transform: translateX(80px) scale(1.2); }
+            50% { transform: translateX(80px) scale(1.2); }
+            100% { transform: translateX(0); }
+        }
+
+        @keyframes monsterAttack {
+            0% { transform: translateX(0); }
+            40% { transform: translateX(-80px) scale(1.2); }
+            50% { transform: translateX(-80px) scale(1.2); }
+            100% { transform: translateX(0); }
+        }
+
+        @keyframes hurt {
+            0%, 100% { transform: translateX(0) scale(1); filter: brightness(1); }
+            20%, 60% { transform: translateX(-10px) rotate(-10deg) scale(0.9); filter: brightness(0.5) sepia(1) hue-rotate(-50deg) saturate(5); }
+            40%, 80% { transform: translateX(10px) rotate(10deg) scale(0.9); filter: brightness(0.5) sepia(1) hue-rotate(-50deg) saturate(5); }
+        }
+
         .hp-bar-container {
-            width: 100%;
-            background-color: #ddd;
+            width: 100px;
+            background-color: #c0392b;
             border-radius: 5px;
-            margin-bottom: 15px;
+            margin: 5px auto;
+            border: 2px solid #fff;
         }
         .hp-bar {
-            height: 20px;
-            background-color: #ff4757;
-            border-radius: 5px;
+            height: 10px;
+            background-color: #2ecc71;
+            border-radius: 3px;
             width: 100%;
             transition: width 0.3s;
         }
-        #feedback { font-weight: bold; margin-bottom: 15px; height: 24px; }
+
+        #feedback { font-size: 18px; font-weight: bold; margin-bottom: 15px; height: 27px; }
+        #question-text { background: #ecf0f1; color: #2c3e50; padding: 15px; border-radius: 10px; }
     </style>
 </head>
 <body>
 
 <div id="game-container">
-    <h1>🛡️ 拯救心愛的寵物大作戰 🐾</h1>
+    <h1>⚔️ 拯救心愛的寵物大作戰 🐾</h1>
     
     <div id="screen-start">
-        <p>你的寵物被壞怪物抓走了！請選擇你的角色，透過回答健康知識問題來擊敗怪物，拯救你的寵物吧！</p>
+        <p>你的寵物被壞怪物抓走了！選好角色準備迎戰吧！</p>
         
-        <h3>人物角色</h3>
+        <h3 style="color:#f1c40f;">人物角色</h3>
         <div class="character-grid">
-            <div class="char-card" onclick="selectChar(this, '勇者 🧑‍🎤')">🧑‍🎤 勇者</div>
-            <div class="char-card" onclick="selectChar(this, '魔法師 🧙‍♂️')">🧙‍♂️ 魔法師</div>
-            <div class="char-card" onclick="selectChar(this, '護衛 💂‍♂️')">💂‍♂️ 護衛</div>
+            <div class="char-card" onclick="selectChar(this, '🧑‍🎤')">🧑‍🎤 勇者</div>
+            <div class="char-card" onclick="selectChar(this, '🧙‍♂️')">🧙‍♂️ 魔法師</div>
+            <div class="char-card" onclick="selectChar(this, '💂‍♂️')">💂‍♂️ 護衛</div>
         </div>
 
-        <h3>動物角色</h3>
+        <h3 style="color:#f1c40f;">動物角色</h3>
         <div class="character-grid">
-            <div class="char-card" onclick="selectChar(this, '小貓 🐱')">🐱 小貓</div>
-            <div class="char-card" onclick="selectChar(this, '小狗 🐶')">🐶 小狗</div>
-            <div class="char-card" onclick="selectChar(this, '小兔 🐰')">🐰 小兔</div>
+            <div class="char-card" onclick="selectChar(this, '🐱')">🐱 小貓</div>
+            <div class="char-card" onclick="selectChar(this, '🐶')">🐶 小狗</div>
+            <div class="char-card" onclick="selectChar(this, '🐰')">🐰 小兔</div>
         </div>
 
-        <button class="btn" onclick="startGame()" style="font-size: 20px;">開始遊戲</button>
+        <button class="btn" onclick="startGame()" style="font-size: 22px; padding: 15px 40px; margin-top: 20px;">進入戰鬥</button>
     </div>
 
     <div id="screen-battle" class="hidden">
-        <div class="status-bar">
-            <div id="player-info">角色: <span id="player-char"></span></div>
-            <div id="player-lives">❤️ 生命值: 3</div>
-            <div id="stage-info">關卡: 1 / 5</div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: bold;">
+            <span style="color:#f1c40f;">目前關卡: <span id="stage-info">1</span> / 5</span>
+            <span style="color:#e74c3c;">❤️ 剩餘命數: <span id="player-lives-text">3</span></span>
         </div>
 
-        <div class="monster-area">
-            <div id="monster-emoji">👾</div>
-            <div id="monster-name" style="font-size: 20px;">初級怪物</div>
-        </div>
-        
-        <div class="hp-bar-container">
-            <div id="monster-hp-bar" class="hp-bar"></div>
+        <div class="battle-stage">
+            <div class="player-side">
+                <div id="player-sprite" class="animated-char">🧑‍🎤</div>
+            </div>
+            
+            <div style="font-size: 30px; font-weight: 900; font-style: italic; color: #f1c40f; text-shadow: 2px 2px 0 #000;">VS</div>
+            
+            <div class="monster-side">
+                <div id="monster-sprite" class="animated-char">👾</div>
+                <div class="hp-info" id="monster-name">初級怪物</div>
+                <div class="hp-bar-container">
+                    <div id="monster-hp-bar" class="hp-bar"></div>
+                </div>
+            </div>
         </div>
 
-        <div id="feedback"></div>
+        <div id="feedback">請回答問題發動攻擊！</div>
 
         <div id="question-container">
             <h3 id="question-text">題目載入中...</h3>
@@ -141,22 +205,21 @@
     </div>
 
     <div id="screen-end" class="hidden">
-        <h2 id="end-title"></h2>
-        <p id="end-desc"></p>
-        <div style="font-size: 80px;" id="end-emoji"></div>
-        <button class="btn" onclick="location.reload()">重新挑戰</button>
+        <h1 id="end-title"></h1>
+        <p id="end-desc" style="font-size: 18px; line-height: 1.6;"></p>
+        <div style="font-size: 100px; animation: idle 2s infinite;" id="end-emoji"></div>
+        <button class="btn" onclick="location.reload()" style="font-size: 20px; margin-top:20px;">重新挑戰</button>
     </div>
 </div>
 
 <script>
-    // 遊戲狀態變數
-    let selectedCharacter = '';
+    let selectedEmoji = '';
     let lives = 3;
-    let currentStage = 0; // 0~4 對應 1~5 關
+    let currentStage = 0; 
     let currentMonsterMaxHP = 1;
     let currentMonsterHP = 1;
+    let isAnimating = false; // 防止連續點擊
 
-    // 怪物設定
     const monsters = [
         { name: "初級史萊姆", emoji: "🦠", type: "TF", hp: 1 },
         { name: "初級蝙蝠", emoji: "🦇", type: "TF", hp: 1 },
@@ -165,7 +228,7 @@
         { name: "超級大魔王", emoji: "👹", type: "MCQ", hp: 3 }
     ];
 
-    // 健康知識題庫 (主題：睡眠品質)
+    // 睡眠品質健康題庫
     const questionsTF = [
         { q: "睡前喝咖啡或濃茶有助於提高睡眠品質。", options: ["⭕ 是", "❌ 否"], ans: 1 },
         { q: "規律的作息時間可以幫助維持良好的生理時鐘，讓人更容易入睡。", options: ["⭕ 是", "❌ 否"], ans: 0 },
@@ -177,48 +240,38 @@
     const questionsMCQ = [
         { q: "下列哪一種環境最適合幫助入睡？", options: ["A. 吵雜且明亮的房間", "B. 安靜、黑暗且溫度適宜的房間", "C. 悶熱且潮濕的環境", "D. 開著電視播放聲音"], ans: 1 },
         { q: "睡前做什麼活動有助於放鬆身心？", options: ["A. 進行高強度的劇烈運動", "B. 看刺激的恐怖電影", "C. 聽輕音樂或進行靜心冥想", "D. 吃豐盛的宵夜大餐"], ans: 2 },
-        { q: "如果躺在床上超過20分鐘還睡不著，最好的作法是什麼？", options: ["A. 繼續躺在床上強迫自己睡著", "B. 起床離開臥室，做些溫和放鬆的活動直到有睡意", "C. 拿起手機開始滑社群軟體", "D. 喝一杯濃茶提神"], ans: 1 },
+        { q: "如果躺在床上超過20分鐘還睡不著，最好的作法是什麼？", options: ["A. 繼續躺在床上強迫自己睡著", "B. 起床離開臥室，做些放鬆的活動直到有睡意", "C. 拿起手機開始滑社群軟體", "D. 喝一杯濃茶提神"], ans: 1 },
         { q: "下列哪一種飲食習慣可能會破壞夜間的睡眠品質？", options: ["A. 晚餐吃得過飽且油膩", "B. 下午過後避免攝取咖啡因", "C. 睡前喝少許溫熱的牛奶", "D. 晚餐吃七分飽"], ans: 0 },
         { q: "關於午睡，下列哪一個觀念是正確的？", options: ["A. 午睡時間越久越好", "B. 午睡最好控制在20到30分鐘內", "C. 傍晚五點過後還可以繼續午睡", "D. 午睡可以完全取代晚上的睡眠"], ans: 1 }
     ];
 
-    // 隨機打亂陣列順序
-    function shuffle(array) {
-        return array.sort(() => Math.random() - 0.5);
-    }
-    
+    function shuffle(array) { return array.sort(() => Math.random() - 0.5); }
     let currentTfQueue = shuffle([...questionsTF]);
     let currentMcqQueue = shuffle([...questionsMCQ]);
 
-    function selectChar(element, charName) {
+    function selectChar(element, emoji) {
         document.querySelectorAll('.char-card').forEach(el => el.classList.remove('selected'));
         element.classList.add('selected');
-        selectedCharacter = charName;
+        selectedEmoji = emoji;
     }
 
     function startGame() {
-        if (!selectedCharacter) {
-            alert("請先選擇一個角色！");
-            return;
-        }
+        if (!selectedEmoji) { alert("請先選擇一個角色！"); return; }
         document.getElementById('screen-start').classList.add('hidden');
         document.getElementById('screen-battle').classList.remove('hidden');
-        document.getElementById('player-char').innerText = selectedCharacter;
+        document.getElementById('player-sprite').innerText = selectedEmoji;
         loadStage();
     }
 
     function loadStage() {
-        if (currentStage >= 5) {
-            endGame(true);
-            return;
-        }
+        if (currentStage >= 5) { endGame(true); return; }
 
         const monster = monsters[currentStage];
         currentMonsterMaxHP = monster.hp;
         currentMonsterHP = monster.hp;
 
-        document.getElementById('stage-info').innerText = `關卡: ${currentStage + 1} / 5`;
-        document.getElementById('monster-emoji').innerText = monster.emoji;
+        document.getElementById('stage-info').innerText = currentStage + 1;
+        document.getElementById('monster-sprite').innerText = monster.emoji;
         document.getElementById('monster-name').innerText = monster.name;
         
         updateHPBar();
@@ -250,40 +303,66 @@
         });
     }
 
+    // 觸發CSS動畫的函式
+    function triggerAnimation(elementId, animationName, duration) {
+        const el = document.getElementById(elementId);
+        el.style.animation = 'none'; 
+        void el.offsetWidth; // 觸發重繪
+        el.style.animation = `${animationName} ${duration}ms forwards`;
+        setTimeout(() => { el.style.animation = 'idle 2s infinite ease-in-out'; }, duration);
+    }
+
     function checkAnswer(selectedIndex, correctIndex) {
+        if (isAnimating) return; // 防止動畫中重複點擊
+        isAnimating = true;
         const feedback = document.getElementById('feedback');
+        
         if (selectedIndex === correctIndex) {
-            // 答對
-            currentMonsterHP--;
-            updateHPBar();
-            feedback.style.color = "green";
-            feedback.innerText = "✨ 答對了！怪物受到傷害！";
+            // 答對邏輯：玩家攻擊 -> 怪物受傷
+            feedback.style.color = "#2ecc71";
+            feedback.innerText = "✨ 答對了！發動攻擊！";
+            triggerAnimation('player-sprite', 'playerAttack', 600);
             
             setTimeout(() => {
-                feedback.innerText = "";
+                triggerAnimation('monster-sprite', 'hurt', 600);
+                currentMonsterHP--;
+                updateHPBar();
+            }, 300); // 等待衝撞到怪物才播受傷
+
+            setTimeout(() => {
+                feedback.innerText = "請回答問題發動攻擊！";
+                feedback.style.color = "#ecf0f1";
+                isAnimating = false;
                 if (currentMonsterHP <= 0) {
                     currentStage++;
                     loadStage();
                 } else {
                     loadQuestion();
                 }
-            }, 1000);
+            }, 1500);
 
         } else {
-            // 答錯
-            lives--;
-            document.getElementById('player-lives').innerText = `❤️ 生命值: ${lives}`;
-            feedback.style.color = "red";
-            feedback.innerText = "💥 答錯了！失去一條生命！";
+            // 答錯邏輯：怪物攻擊 -> 玩家受傷
+            feedback.style.color = "#e74c3c";
+            feedback.innerText = "💥 答錯了！遭到怪物反擊！";
+            triggerAnimation('monster-sprite', 'monsterAttack', 600);
             
             setTimeout(() => {
-                feedback.innerText = "";
+                triggerAnimation('player-sprite', 'hurt', 600);
+                lives--;
+                document.getElementById('player-lives-text').innerText = lives;
+            }, 300);
+
+            setTimeout(() => {
+                feedback.innerText = "請回答問題發動攻擊！";
+                feedback.style.color = "#ecf0f1";
+                isAnimating = false;
                 if (lives <= 0) {
                     endGame(false);
                 } else {
-                    loadQuestion(); // 答錯換一題
+                    loadQuestion(); 
                 }
-            }, 1000);
+            }, 1500);
         }
     }
 
@@ -297,14 +376,14 @@
         document.getElementById('screen-end').classList.remove('hidden');
 
         if (isWin) {
-            document.getElementById('end-title').innerText = "🎉 任務完成！ 🎉";
-            document.getElementById('end-title').style.color = "#2ecc71";
-            document.getElementById('end-desc').innerText = "太棒了！你運用了豐富的健康知識擊敗了所有怪物，成功救回了心愛的寵物！";
-            document.getElementById('end-emoji').innerText = "🐶💕🐱";
+            document.getElementById('end-title').innerText = "🎉 任務大成功！";
+            document.getElementById('end-title').style.color = "#f1c40f";
+            document.getElementById('end-desc').innerText = "太棒了！你運用了睡眠健康知識擊退所有怪物，\n你的寵物終於平安回到你身邊了！";
+            document.getElementById('end-emoji').innerText = "🏆" + selectedEmoji + "🐕";
         } else {
-            document.getElementById('end-title').innerText = "💀 任務失敗 💀";
+            document.getElementById('end-title').innerText = "💀 任務失敗";
             document.getElementById('end-title').style.color = "#e74c3c";
-            document.getElementById('end-desc').innerText = "生命值歸零了...寵物還在怪物手裡，重整旗鼓後再次挑戰吧！";
+            document.getElementById('end-desc').innerText = "生命值歸零了...\n休息一下，複習一下睡眠知識再重新出發吧！";
             document.getElementById('end-emoji').innerText = "👻";
         }
     }
